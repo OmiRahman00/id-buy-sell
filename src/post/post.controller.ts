@@ -49,6 +49,17 @@ export class PostController {
         return this.postService.findPostById(id);
     }
 
+
+    /*
+   * GET a post by user ID
+   */
+    @Get('user/:userId')
+    public getPostByUserId(
+        @Param('userId', ParseIntPipe) userId: number,
+    ){
+        return this.postService.findPostByUserId(userId);
+    }
+
     /**
    * Route to delete a post
    */

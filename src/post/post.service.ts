@@ -54,7 +54,14 @@ export class PostService {
         //         metaOptions: true,
         //     }
         // })
-        let posts = await this.postRepository.find()
+        let posts = await this.postRepository.find(
+            {
+                relations:{
+                    metaOption: true,
+                    author: true,
+                }
+            }
+        )
         return posts;
     }
 
@@ -77,6 +84,28 @@ export class PostService {
                 post: true,
             },
         })
+        return post;
+    }
+
+
+    /**
+     * implementing find post by user id
+     */
+
+    public async findPostByUserId(userId: number) {
+        console.log(userId)
+        let post = await this.postRepository.find({
+            where: {
+                author: {
+                    id: userId,
+                },
+            },
+            relations: {
+                metaOption: true,
+                author: true,
+            },
+        })
+        console.log(post);
         return post;
     }
 
