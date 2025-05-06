@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -9,6 +9,16 @@ export class PostController {
         private readonly postService: PostService,
     ) {}
 
+
+    /*
+   * GET localhost:3000/posts/:userId
+   */
+    @Get()
+    public getPost(
+        @Param('/:userId') userId: string,
+    ){
+        return this.postService.findAllById(userId);    
+    }
 
     @ApiOperation({
         summary: 'Creates a new blog post',
@@ -23,4 +33,27 @@ export class PostController {
     ){
         return this.postService.create(createPostDto);
     }
+
+
+    @ApiOperation({
+        summary: 'Fetches a post by id',
+      })
+      @ApiResponse({
+        status: 200,
+        description: 'Post fetched successfully',
+      })
+    @Get('post/:id')
+    public getPostById(
+        @Param('id', ParseIntPipe) id: number,
+    ){
+        return this.postService.findPostById(id);
+    }
+
+    /**
+   * Route to delete a post
+   */
+  @Delete('delete/:id')
+  public deletePost(@Param('id', ParseIntPipe) id: number) {
+    return this.postService.delete(id);
+  }
 }

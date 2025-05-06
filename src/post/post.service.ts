@@ -26,18 +26,72 @@ export class PostService {
     ) {}
 
     public async create(createPostDto: CreatePostDto) {
-        // Create the metaOptions first if they exist
-        // Transform metaOptions to match the expected type
-        const transformedDto = {
+        // Create a new post entity
+        let post = this.postRepository.create({
             ...createPostDto,
-            metaOptions: createPostDto.metaOptions
-                ? { ...createPostDto.metaOptions }
-                : undefined,
-        };
+            metaOption: createPostDto.metaOption 
+                ? this.metaOptionRepository.create(createPostDto.metaOption)
+                : undefined
+        });
+        
+        let author = await this.userService.findOne(createPostDto.authorId)
+        // Save the post (and its meta option via cascade)
+        return await this.postRepository.create({
+            ...post,
+            author: author,
+        });
+    }
 
-        let post = this.postRepository.create(transformedDto);
+    public async findAllById(userId: string) {
+        // const user = this.userService.findOne(userId);
+
+        /**
+         * Get all posts by user id with metaOptions when the eager not true in the post.entity.ts
+         * */
+
+        // let posts = await this.postRepository.find({
+        //     relations: {
+        //         metaOptions: true,
+        //     }
+        // })
+        let posts = await this.postRepository.find()
+        return posts;
+    }
+
+
+    public async findPostById(id: number) {
+        // let post = await this.postRepository.find({
+        //     where: {
+        //         id,
+        //     },
+        //     relations: {
+        //         metaOption: true,
+        //     },
+        // })
+
+        let post = await this.metaOptionRepository.find({
+            where: {
+                id,
+            },
+            relations: {
+                post: true,
+            },
+        })
+        return post;
+    }
+
+    /**
+     * implementing sequential delete
+     */
+
+    public async delete(id: number) {
+        // find the post
+        
+        await this.postRepository.delete(id);  
+
+        return {deleted: true, id}
+
+    }
     
-        return await this.postRepository.save(post);
-      }
     
 }
