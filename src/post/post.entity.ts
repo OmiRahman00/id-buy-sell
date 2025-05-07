@@ -72,6 +72,7 @@ export class Post {
 
   @ManyToOne(() => User, (user) => user.posts)
   author: User;
+  
   @OneToOne(() => MetaOption,(MetaOption)=> MetaOption.post ,{
     // cascade: ['insert', 'remove'],
     cascade: true,

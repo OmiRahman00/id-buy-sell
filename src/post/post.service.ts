@@ -36,7 +36,7 @@ export class PostService {
         
         let author = await this.userService.findOne(createPostDto.authorId)
         // Save the post (and its meta option via cascade)
-        return await this.postRepository.create({
+        return await this.postRepository.save({
             ...post,
             author: author,
         });
