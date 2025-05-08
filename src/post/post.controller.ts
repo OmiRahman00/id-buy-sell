@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { PatchPostDto } from './dtos/patch-post.dto';
 
 @Controller('post')
 export class PostController {
@@ -58,6 +59,16 @@ export class PostController {
         @Param('userId', ParseIntPipe) userId: number,
     ){
         return this.postService.findPostByUserId(userId);
+    }
+
+    @ApiResponse({
+      status: 200,
+      description: 'A 200 response if the post is updated successfully',
+    })
+    @Patch('update')
+    public updatePost(@Body() patchPostsDto: PatchPostDto) {
+      return this.postService.updatePost( patchPostsDto);
+      
     }
 
     /**

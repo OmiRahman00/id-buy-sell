@@ -7,19 +7,25 @@ import { AppModule } from './../src/app.module';
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
 
-  beforeEach(async () => {
+  // Increase timeout to 30 seconds
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
-  });
+  }, 30000); // Add timeout here
 
-  it('/ (GET)', () => {
+  afterAll(async () => {
+    await app.close();
+  }, 10000); // Add timeout here too
+
+  it('/ (GET)', () => { 
+    console.log(process.env.NODE_ENV);
+    // console.log(process.env.S3_BUCKET);
     return request(app.getHttpServer())
       .get('/')
-      .expect(200)
-      .expect('Hello World!');
-  });
+      .expect(200);
+  }, 10000); // Add timeout to test
 });

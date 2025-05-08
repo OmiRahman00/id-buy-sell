@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, RequestTimeoutException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { GetUsersParamDto } from './dtos/get-users-param.dto';
+import { ConfigType } from '@nestjs/config';
+import profileConfig from './config/profile.config';
 
 @Injectable()
 export class UserService {
@@ -13,6 +15,13 @@ export class UserService {
      * */
         @InjectRepository(User)
         private userRepository: Repository<User>,
+
+
+        /**
+     * Injecting ProfileConfig into UsersService
+     */
+        @Inject(profileConfig.KEY)
+        private readonly profileConfiguration: ConfigType<typeof profileConfig>,
     ) {}
     
     public async createUser(createUserDto: CreateUserDto){
@@ -20,14 +29,30 @@ export class UserService {
         /**
          * Check if the user already exist or not
          */
-        const existingUser = await this.userRepository.findOne({
-            where: {
-                email: createUserDto.email,
-            },
-        });
-        if(existingUser){
-            throw new Error('User already exists');
+
+        let existingUser= undefined;
+        try{
+            
+            existingUser = await this.userRepository.findOne({
+               where: {
+                   email: createUserDto.email,
+               },
+           });
+        }catch(error){
+            throw new RequestTimeoutException(
+                'Unable to process your request at the moment please try later',
+                {
+                  description: 'Error connecting to database',
+                },
+              );
         }
+
+        if (existingUser) {
+            throw new BadRequestException(
+              'The user already exists, please check your email',
+            );
+          }
+        
         let newUser = this.userRepository.create(createUserDto);
         newUser = await this.userRepository.save(newUser);
         return newUser;
@@ -46,6 +71,8 @@ export class UserService {
         limit: number,
         offset: number,
     ) {
+        console.log(this.profileConfiguration);
+        console.log(this.profileConfiguration.apiKey); 
         return await this.userRepository.find();
     }
 

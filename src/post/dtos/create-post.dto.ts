@@ -22,6 +22,7 @@ import { postStatus } from '../enums/postStatus.enum';
 import { postType } from '../enums/postType.enum';
 
 export class CreatePostDto {
+
   @ApiProperty({
     example: 'This is a title',
     description: 'This is the title for the blog post',
@@ -99,14 +100,13 @@ export class CreatePostDto {
   publishOn?: Date;
 
   @ApiPropertyOptional({
-    description: 'Array of tags passed as string values',
-    example: ['nestjs', 'typescript'],
+    description: 'Array of ids of tags passed as integers in an array',
+    example: [1, 2],
   })
   @IsOptional()
   @IsArray()
-  @IsString({ each: true })
-  @MinLength(3, { each: true })
-  tags?: string[];
+  @IsInt({ each: true })
+  tags?: number[];
 
   @IsOptional()
   @ValidateNested({ each: true })
