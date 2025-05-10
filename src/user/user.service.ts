@@ -1,11 +1,13 @@
 import { BadRequestException, Inject, Injectable, RequestTimeoutException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { GetUsersParamDto } from './dtos/get-users-param.dto';
 import { ConfigType } from '@nestjs/config';
 import profileConfig from './config/profile.config';
+import { UserCreateManyService } from './user-create-many.service';
+import { CreateManyUsersDto } from './dtos/create-many-users.dto';
 
 @Injectable()
 export class UserService {
@@ -17,6 +19,8 @@ export class UserService {
         private userRepository: Repository<User>,
 
 
+     
+        private readonly userCreateManyService: UserCreateManyService,
         /**
      * Injecting ProfileConfig into UsersService
      */
@@ -145,4 +149,7 @@ export class UserService {
         return await this.userRepository.remove(user);
     }
 
+    public async createMany(createManyUsersDto: CreateManyUsersDto) {
+        return await this.userCreateManyService.createMany(createManyUsersDto);
+    }
 }

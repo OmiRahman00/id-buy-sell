@@ -18,6 +18,7 @@ import {
 import { UserService } from './user.service';
 import { GetUsersParamDto } from './dtos/get-users-param.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { CreateManyUsersDto } from './dtos/create-many-users.dto';
 
 @Controller('user')
 @ApiTags('User')
@@ -100,5 +101,10 @@ export class UserController {
     ){
         return this.userService.update(id, updateUserDto);
     }
+
+    @Post('create-many')
+  public createManyUsers(@Body() createManyUsersDto: CreateManyUsersDto) {
+    return this.userService.createMany(createManyUsersDto);
+  } 
     
 }
