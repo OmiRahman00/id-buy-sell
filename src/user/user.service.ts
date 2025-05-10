@@ -32,7 +32,7 @@ export class UserService {
 
         let existingUser= undefined;
         try{
-            
+            //@ts-ignore
             existingUser = await this.userRepository.findOne({
                where: {
                    email: createUserDto.email,
@@ -54,7 +54,17 @@ export class UserService {
           }
         
         let newUser = this.userRepository.create(createUserDto);
-        newUser = await this.userRepository.save(newUser);
+        try {
+            
+            newUser = await this.userRepository.save(newUser);
+        } catch (error) {
+            throw new RequestTimeoutException(
+                'Unable to process your request at the moment please try later',
+                {
+                  description: 'Error connecting to database',
+                },
+              );
+        }
         return newUser;
        
     }
@@ -82,15 +92,23 @@ export class UserService {
      */
 
     public async findOne(id: number) {
-        const user = await this.userRepository.findOne({
-            where: {
-                id,
-            },
-        });
-        if (!user) {
-            throw new Error('User not found');
+
+        try {
+            
+            return await this.userRepository.findOne({
+                where: {
+                    id,
+                },
+            });
+        } catch (error) {
+            throw new RequestTimeoutException(
+                'Unable to process your request at the moment please try later',
+                {
+                  description: 'Error connecting to database',
+                },
+              );
         }
-        return user;
+        
     }
 
     /**
