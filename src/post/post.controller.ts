@@ -3,6 +3,7 @@ import { PostService } from './post.service';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { PatchPostDto } from './dtos/patch-post.dto';
+import { GetPostsDto } from './dtos/get-post.dto';
 
 @Controller('post')
 export class PostController {
@@ -57,8 +58,10 @@ export class PostController {
     @Get('user/:userId')
     public getPostByUserId(
         @Param('userId', ParseIntPipe) userId: number,
+        @Query() postQuery: GetPostsDto,
     ){
-        return this.postService.findPostByUserId(userId);
+        // console.log(postQuery);
+        return this.postService.findPostByUserId(postQuery,userId);
     }
 
     @ApiResponse({

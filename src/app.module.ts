@@ -8,6 +8,7 @@ import { TagsModule } from './tags/tags.module';
 import { MetaOptionsModule } from './meta-options/meta-options.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { appConfig } from './config/app.config';
+import { PaginationModule } from './common/pagination/pagination.module';
 import databaseConfig from './config/database.config';
 import enviromentValidation from './config/enviroment.validation';
 
@@ -38,7 +39,8 @@ const ENV = process.env.NODE_ENV;
         autoLoadEntities: configService.get<boolean>('database.autoLoadEntities'),
         synchronize: configService.get<boolean>('database.synchronize'),
       }),
-    })
+    }),
+    PaginationModule
   ],
   controllers: [AppController],
   providers: [AppService],

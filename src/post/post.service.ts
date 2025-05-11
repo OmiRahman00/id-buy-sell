@@ -8,6 +8,9 @@ import { UserService } from 'src/user/user.service';
 import { Tag } from 'src/tags/tag.entity';
 import { TagsService } from 'src/tags/tags.service';
 import { PatchPostDto } from './dtos/patch-post.dto';
+import { GetPostsDto } from './dtos/get-post.dto';
+import { PaginationService } from 'src/common/pagination/pagination.service';
+import { Paginated } from 'src/common/pagination/interfaces/paginated.interface';
 
 @Injectable()
 export class PostService {
@@ -28,6 +31,11 @@ export class PostService {
         @InjectRepository(Post)
         private readonly postRepository: Repository<Post>,
 
+
+        /**
+     * Injecting PaginationService into PostService
+     * */
+        private readonly paginationService: PaginationService,
          
     ) {}
 
@@ -128,21 +136,28 @@ export class PostService {
      * implementing find post by user id
      */
 
-    public async findPostByUserId(userId: number) {
-        console.log(userId)
-        let post = await this.postRepository.find({
-            where: {
-                author: {
-                    id: userId,
-                },
-            },
-            relations: {
-                metaOption: true,
-                author: true,
-            },
-        })
-        // console.log(post);
-        return post;
+    public async findPostByUserId(postQuery: GetPostsDto, userId: number) : Promise<Paginated<Post>> {
+        try {
+            const queryBuilder = this.postRepository.createQueryBuilder('post')
+                .leftJoinAndSelect('post.metaOption', 'metaOption')
+                .leftJoinAndSelect('post.author', 'author')
+                .leftJoinAndSelect('post.tags', 'tags')
+                .where('author.id = :userId', { userId });
+            
+            // Use the pagination service
+            const posts = await this.paginationService.paginateQuery(postQuery, this.postRepository);
+            
+            if (!posts || posts.data.length === 0) {
+                throw new NotFoundException(`No posts found for user with ID ${userId}`);
+            }
+            
+            return posts;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new BadRequestException(`Failed to retrieve posts: ${error.message}`);
+        }
     }
 
     /**
