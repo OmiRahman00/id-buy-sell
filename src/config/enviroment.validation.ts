@@ -7,4 +7,8 @@ export default Joi.object({
     DATABASE_URL: Joi.string().uri().required(),
     DATABASE_SYNC: Joi.boolean().default(false),
     DATABASE_AUTOLOAD: Joi.boolean().default(false),
+    JWT_SECRET: Joi.string().required(),
+  JWT_TOKEN_AUDIENCE: Joi.required(),
+  JWT_TOKEN_ISSUER: Joi.string().required(),
+  JWT_ACCESS_TOKEN_TTL: Joi.number().required(),
 })

@@ -9,8 +9,13 @@ import { MetaOptionsModule } from './meta-options/meta-options.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { appConfig } from './config/app.config';
 import { PaginationModule } from './common/pagination/pagination.module';
+import { AuthModule } from './auth/auth.module';
 import databaseConfig from './config/database.config';
 import enviromentValidation from './config/enviroment.validation';
+import { JwtModule } from '@nestjs/jwt';
+import jwtConfig from 'src/auth/config/jwt.config';
+import { AccessTokenGuard } from './auth/gaurds/access-token/access-token.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 
 const ENV = process.env.NODE_ENV;
@@ -40,9 +45,17 @@ const ENV = process.env.NODE_ENV;
         synchronize: configService.get<boolean>('database.synchronize'),
       }),
     }),
-    PaginationModule
+    PaginationModule,
+    AuthModule,
+    ConfigModule.forFeature(jwtConfig),
+    JwtModule.registerAsync(jwtConfig.asProvider()),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,
+  {
+    provide: APP_GUARD,
+    useClass: AccessTokenGuard, 
+  }
+  ],
 })
 export class AppModule { }
