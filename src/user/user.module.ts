@@ -19,8 +19,6 @@ import { AccessTokenGuard } from 'src/auth/gaurds/access-token/access-token.guar
     TypeOrmModule.forFeature([User]),
     ConfigModule.forFeature(profileConfig),
     forwardRef(() => AuthModule),
-    ConfigModule.forFeature(jwtConfig),
-    JwtModule.registerAsync(jwtConfig.asProvider()),
   ],
   controllers: [UserController],
   providers: [

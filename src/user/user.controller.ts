@@ -14,6 +14,7 @@ import {
     DefaultValuePipe,
     ValidationPipe,
     UseGuards,
+    SetMetadata,
   } from '@nestjs/common';
   import { ApiTags, ApiQuery, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserService } from './user.service';
@@ -21,6 +22,8 @@ import { GetUsersParamDto } from './dtos/get-users-param.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { CreateManyUsersDto } from './dtos/create-many-users.dto';
 import { AccessTokenGuard } from 'src/auth/gaurds/access-token/access-token.guard';
+import { Auth } from 'src/auth/decorator/auth.decorator';
+import { AuthType } from 'src/auth/enums/auth-type.enum';
 
 @Controller('user')
 @ApiTags('User')
@@ -76,6 +79,7 @@ export class UserController {
     }
     
     @Post('create')
+    @Auth(AuthType.None)
     @ApiOperation({
         summary: 'Create a new user',
       })
@@ -104,7 +108,6 @@ export class UserController {
         return this.userService.update(id, updateUserDto);
     }
 
-    @UseGuards(AccessTokenGuard)
     @Post('create-many')
   public createManyUsers(@Body() createManyUsersDto: CreateManyUsersDto) {
     return this.userService.createMany(createManyUsersDto);

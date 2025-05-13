@@ -4,6 +4,8 @@ import { CreatePostDto } from './dtos/create-post.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { PatchPostDto } from './dtos/patch-post.dto';
 import { GetPostsDto } from './dtos/get-post.dto';
+import { ActiveUser } from 'src/auth/decorator/active-user.decorator';
+import { ActiveUserData } from 'src/auth/interfaces/active-user-data.interface';
 
 @Controller('post')
 export class PostController {
@@ -32,6 +34,7 @@ export class PostController {
     @Post('create')
     public create(
         @Body() createPostDto: CreatePostDto,
+        @ActiveUser() user: ActiveUserData,
     ){
         return this.postService.create(createPostDto);
     }
