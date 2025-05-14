@@ -31,7 +31,7 @@ export class AuthenticationGuard implements CanActivate  {
       context.getClass(), //get context from class  actually getting meta value
     ]
   ) ?? [AuthenticationGuard.defaultAuthType];
-   console.log(authTypes)
+  //  console.log(authTypes)
     //array of guards
     const gaurds = authTypes.map((authType) => this.authTypeGaurdmap[authType]).flat();
     // console.log(gaurds);
