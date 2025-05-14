@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Body } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './post.entity';
 import { Repository } from 'typeorm';
@@ -11,6 +11,8 @@ import { PatchPostDto } from './dtos/patch-post.dto';
 import { GetPostsDto } from './dtos/get-post.dto';
 import { PaginationService } from 'src/common/pagination/pagination.service';
 import { Paginated } from 'src/common/pagination/interfaces/paginated.interface';
+import { CreatePostProvider } from './providers/create-post.provider';
+import { ActiveUserData } from 'src/auth/interfaces/active-user-data.interface';
 
 @Injectable()
 export class PostService {
@@ -36,43 +38,18 @@ export class PostService {
      * Injecting PaginationService into PostService
      * */
         private readonly paginationService: PaginationService,
+
+
+        /**
+     * Injecting CreatePostProvider into PostService
+     * */
+
+        private readonly createPostProvider: CreatePostProvider,
          
     ) {}
 
-    public async create(createPostDto: CreatePostDto) {
-        try {
-            //find user exist or not first
-            let author = await this.userService.findOne(createPostDto.authorId)
-            if (!author) {
-                throw new NotFoundException(`Author with ID ${createPostDto.authorId} not found`);
-            }
-            
-            //find the tags first
-            let tags: Tag[] = [];
-            if (createPostDto.tags && createPostDto.tags.length > 0) {
-                tags = await this.tagsService.findMultipleTags(createPostDto.tags);
-                // Verify all tags were found
-                if (tags.length !== createPostDto.tags.length) {
-                    throw new BadRequestException('One or more tags could not be found');
-                }
-            }
-            
-            // Save the post (and its meta option via cascade)
-            let post = this.postRepository.create({
-                ...createPostDto,
-                author: author,
-                tags: tags,
-                metaOption: createPostDto.metaOption 
-                    ? { ...createPostDto.metaOption } 
-                    : undefined,
-            });
-            return await this.postRepository.save(post);
-        } catch (error) {
-            if (error instanceof NotFoundException || error instanceof BadRequestException) {
-                throw error;
-            }
-            throw new BadRequestException('Failed to create post: ' + error.message);
-        }
+    public async create( @Body() createPostDto: CreatePostDto, user: ActiveUserData) {
+        return await this.createPostProvider.create(createPostDto, user);
     }
 
     public async findAllById(userId: string) {

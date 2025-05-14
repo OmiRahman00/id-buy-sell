@@ -36,7 +36,7 @@ export class PostController {
         @Body() createPostDto: CreatePostDto,
         @ActiveUser() user: ActiveUserData,
     ){
-        return this.postService.create(createPostDto);
+        return this.postService.create(createPostDto,user);
     }
 
 

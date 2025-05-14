@@ -8,10 +8,11 @@ import { MetaOptionsModule } from 'src/meta-options/meta-options.module';
 import { MetaOption } from 'src/meta-options/meta-option.entity';
 import { TagsModule } from 'src/tags/tags.module';
 import { PaginationModule } from 'src/common/pagination/pagination.module';
+import { CreatePostProvider } from './providers/create-post.provider';
 
 @Module({
   imports:[TypeOrmModule.forFeature([Post,MetaOption]),UserModule, MetaOptionsModule, TagsModule, PaginationModule],
   controllers: [PostController],
-  providers: [PostService]
+  providers: [PostService, CreatePostProvider]
 })
 export class PostModule {}
