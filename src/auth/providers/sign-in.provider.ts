@@ -28,6 +28,10 @@ export class SignInProvider {
 
     let isEqual: boolean = false;
 
+    if (!user.password) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
     try {
       isEqual = await this.hasingProvider.comparePassword(
         signInDto.password,

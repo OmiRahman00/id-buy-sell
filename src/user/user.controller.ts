@@ -15,6 +15,8 @@ import {
     ValidationPipe,
     UseGuards,
     SetMetadata,
+    UseInterceptors,
+    ClassSerializerInterceptor,
   } from '@nestjs/common';
   import { ApiTags, ApiQuery, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserService } from './user.service';
@@ -80,6 +82,7 @@ export class UserController {
     
     @Post('create')
     @Auth(AuthType.None)
+    @UseInterceptors(ClassSerializerInterceptor) //exclude any property from the response
     @ApiOperation({
         summary: 'Create a new user',
       })

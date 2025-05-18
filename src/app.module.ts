@@ -15,8 +15,10 @@ import enviromentValidation from './config/enviroment.validation';
 import { JwtModule } from '@nestjs/jwt';
 import jwtConfig from 'src/auth/config/jwt.config';
 import { AccessTokenGuard } from './auth/gaurds/access-token/access-token.guard';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthenticationGuard } from './auth/gaurds/authentication/authentication.guard';
+import { DataResponseInterceptor } from './common/interceptors/data-response/data-response.interceptor';
+import { MailModule } from './mail/mail.module';
 
 
 const ENV = process.env.NODE_ENV;
@@ -28,6 +30,7 @@ const ENV = process.env.NODE_ENV;
     {
       isGlobal: true,
       envFilePath: !ENV ? '.env' : `.env.${ENV}`,
+      // envFilePath: '.env.development',
       load: [appConfig, databaseConfig],
       validationSchema: enviromentValidation,
     }
@@ -50,12 +53,17 @@ const ENV = process.env.NODE_ENV;
     AuthModule,
     ConfigModule.forFeature(jwtConfig),
     JwtModule.registerAsync(jwtConfig.asProvider()),
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService,
   {
     provide: APP_GUARD,
     useClass: AuthenticationGuard, 
+  },
+  {
+    provide: APP_INTERCEPTOR,
+    useClass: DataResponseInterceptor,  //globally add interceptor to the whole system
   },
   AccessTokenGuard,
   ],

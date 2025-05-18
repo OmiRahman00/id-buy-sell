@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, RequestTimeoutException } from '@nestjs/common';
+import { BadRequestException, ClassSerializerInterceptor, Inject, Injectable, RequestTimeoutException, UseInterceptors } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { DataSource, Repository } from 'typeorm';
@@ -10,6 +10,11 @@ import { UserCreateManyService } from './user-create-many.service';
 import { CreateManyUsersDto } from './dtos/create-many-users.dto';
 import { CreateUserProvider } from './providers/create-user.provider';
 import { FindOneUserByEmailProvider } from './providers/find-one-user-by-email.provider';
+import { FindOneBtGoogleIdProvider } from './providers/find-one-bt-google-id.provider';
+import { CreateGoogleUserProvider } from './providers/create-google-user.provider';
+import { GoogleUser } from './interfaces/google-user.inerface';
+import { Auth } from 'src/auth/decorator/auth.decorator';
+import { AuthType } from 'src/auth/enums/auth-type.enum';
 
 @Injectable()
 export class UserService {
@@ -40,8 +45,19 @@ export class UserService {
      * Injecting FindOneUserByEmailProvider into UsersService
     */
         private readonly findOneUserByEmailProvider: FindOneUserByEmailProvider,
+         /**
+     * Injecting FindOneBtGoogleIdProvider into UsersService
+     */
+        private readonly findOneBtGoogleIdProvider: FindOneBtGoogleIdProvider,
+
+        /**
+     * Injecting CreateGoogleUserProvider into UsersService
+     */
+        private readonly createGoogleUserProvider: CreateGoogleUserProvider,
+
     ) {}
     
+    // @UseInterceptors(ClassSerializerInterceptor) //exclude any property from the response
     public async createUser(createUserDto: CreateUserDto){
         return await this.createUserProvider.createUser(createUserDto);
     }
@@ -128,6 +144,15 @@ export class UserService {
 
     public async findOneByEmail(email: string) {
         return await this.findOneUserByEmailProvider.findOneByEmail(email);
+    }
+
+    public async findOneByGoogleId(googleId: string) {
+        return await this.findOneBtGoogleIdProvider.findOneByGoogleId(googleId);
+    }
+
+
+    public async createGoogleUser(googleUser: GoogleUser) {
+        return await this.createGoogleUserProvider.createGoogleUser(googleUser);
     }
 
 }
